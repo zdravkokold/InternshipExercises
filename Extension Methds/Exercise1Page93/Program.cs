@@ -1,8 +1,8 @@
-﻿namespace Exercise1
-{
-    using System;
-    using System.Text;
+using System;
+using System.Text;
 
+namespace Exercise1
+{   
     public static class StringBuilderExtensions
     {
         public static string Substring(this StringBuilder stringBuilder, int index, int length)
