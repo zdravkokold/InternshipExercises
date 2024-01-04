@@ -1,0 +1,14 @@
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\bin\Debug\net8.0\Exercise2Page93.exe
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\bin\Debug\net8.0\Exercise2Page93.deps.json
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\bin\Debug\net8.0\Exercise2Page93.runtimeconfig.json
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\bin\Debug\net8.0\Exercise2Page93.dll
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\bin\Debug\net8.0\Exercise2Page93.pdb
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\obj\Debug\net8.0\Exercise2Page93.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\obj\Debug\net8.0\Exercise2Page93.AssemblyInfoInputs.cache
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\obj\Debug\net8.0\Exercise2Page93.AssemblyInfo.cs
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\obj\Debug\net8.0\Exercise2Page93.csproj.CoreCompileInputs.cache
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\obj\Debug\net8.0\Exercise2Page93.dll
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\obj\Debug\net8.0\refint\Exercise2Page93.dll
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\obj\Debug\net8.0\Exercise2Page93.pdb
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\obj\Debug\net8.0\Exercise2Page93.genruntimeconfig.cache
+C:\Users\ATP-1\VS Exercises\Exercise2Page93\obj\Debug\net8.0\ref\Exercise2Page93.dll
