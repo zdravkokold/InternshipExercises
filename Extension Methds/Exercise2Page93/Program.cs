@@ -1,9 +1,9 @@
-﻿namespace Exercise2Page93
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace Exercise2Page93
+{   
     public static class EnumerableExtensions
     {
         public static T Sum<T>(this IEnumerable<T> source)
