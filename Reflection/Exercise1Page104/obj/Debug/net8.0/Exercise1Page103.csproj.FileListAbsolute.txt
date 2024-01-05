@@ -1,0 +1,14 @@
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\bin\Debug\net8.0\Exercise1Page103.exe
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\bin\Debug\net8.0\Exercise1Page103.deps.json
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\bin\Debug\net8.0\Exercise1Page103.runtimeconfig.json
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\bin\Debug\net8.0\Exercise1Page103.dll
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\bin\Debug\net8.0\Exercise1Page103.pdb
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\obj\Debug\net8.0\Exercise1Page103.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\obj\Debug\net8.0\Exercise1Page103.AssemblyInfoInputs.cache
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\obj\Debug\net8.0\Exercise1Page103.AssemblyInfo.cs
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\obj\Debug\net8.0\Exercise1Page103.csproj.CoreCompileInputs.cache
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\obj\Debug\net8.0\Exercise1Page103.dll
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\obj\Debug\net8.0\refint\Exercise1Page103.dll
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\obj\Debug\net8.0\Exercise1Page103.pdb
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\obj\Debug\net8.0\Exercise1Page103.genruntimeconfig.cache
+C:\Users\ATP-1\VS Exercises\Reflection\Exercise1Page103\obj\Debug\net8.0\ref\Exercise1Page103.dll
