@@ -34,10 +34,6 @@ namespace School
             {
                 Students.Remove(student);
             }
-            else
-            {
-                throw new ArgumentException("Student does not exist!");
-            }
         }
     }
 }
