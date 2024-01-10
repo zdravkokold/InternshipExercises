@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingBluehost", "TestingBluehost.csproj", "{4CAED369-AC9D-444E-A74B-1B6A41576155}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4CAED369-AC9D-444E-A74B-1B6A41576155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CAED369-AC9D-444E-A74B-1B6A41576155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CAED369-AC9D-444E-A74B-1B6A41576155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CAED369-AC9D-444E-A74B-1B6A41576155}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF60B5AC-597E-42C5-96C7-47779EBC3556}
+	EndGlobalSection
+EndGlobal
