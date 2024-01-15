@@ -31,7 +31,6 @@ namespace RocketShop.Pages
         {
             string script = $"document.querySelector(\"[class*='checkout-button button alt wc-forward']\").click()";
             ((IJavaScriptExecutor)Driver).ExecuteScript(script);
-
             WaitUntilPageLoadsCompletely();
         }
 
