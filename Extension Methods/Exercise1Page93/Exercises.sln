@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exercise1Page93", "Exercise1Page93.csproj", "{70D62904-6578-4F90-BDB0-733B9E65E563}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExtensionMethods", "ExtensionMethods", "{A34C4AF0-5192-4F21-80CE-8D1FBA97C4DA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Volume1", "Volume1", "{734713F7-0255-4C46-8BE9-F5AED805D95E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{70D62904-6578-4F90-BDB0-733B9E65E563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70D62904-6578-4F90-BDB0-733B9E65E563}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70D62904-6578-4F90-BDB0-733B9E65E563}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70D62904-6578-4F90-BDB0-733B9E65E563}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{70D62904-6578-4F90-BDB0-733B9E65E563} = {A34C4AF0-5192-4F21-80CE-8D1FBA97C4DA}
+		{A34C4AF0-5192-4F21-80CE-8D1FBA97C4DA} = {734713F7-0255-4C46-8BE9-F5AED805D95E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6891EC2B-C836-4D0C-8A79-B0172679485F}
+	EndGlobalSection
+EndGlobal
