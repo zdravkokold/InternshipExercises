@@ -1,0 +1,719 @@
+{
+	"info": {
+		"_postman_id": "bbfa14ed-4e7d-4d84-8dc8-994e0912fb0c",
+		"name": "Music Shop",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "32414724",
+		"_collection_link": "https://interstellar-comet-352053.postman.co/workspace/Music-Shop~cda9a1cc-e2e8-4433-87bb-b017cd0cc205/collection/32414724-bbfa14ed-4e7d-4d84-8dc8-994e0912fb0c?action=share&source=collection_link&creator=32414724"
+	},
+	"item": [
+		{
+			"name": "Update New Genre",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var genresGetRequest = {\r",
+							"    url: pm.environment.get(\"host\") + '/Genres',\r",
+							"    method: \"GET\"\r",
+							"}\r",
+							"var genresIds = new Array();\r",
+							"var newGenreId;\r",
+							"pm.sendRequest(genresGetRequest, function(err, response){\r",
+							"    genresIds = _.map(response.json(), function(response){ \r",
+							"        return response.genreId; \r",
+							"    });\r",
+							"    newGenreId = genresIds[genresIds.length - 1] + 1;\r",
+							"    pm.variables.set(\"newGenreId\", newGenreId);\r",
+							"\r",
+							"    var newGenrePostRequest = {\r",
+							"        url: pm.environment.get(\"host\") + '/Genres',\r",
+							"        method: 'POST',\r",
+							"        header: { 'content-type': 'application/json' },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: {\r",
+							"            \"genreId\": newGenreId,\r",
+							"            \"name\": pm.variables.replaceIn('{{$timestamp}}'),\r",
+							"            \"tracks\": []\r",
+							"            }\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(newGenrePostRequest, function (err, response) {\r",
+							"        if (err) {\r",
+							"            console.log(err);\r",
+							"            console.log(response.body);\r",
+							"        }\r",
+							"    });\r",
+							"\r",
+							"    pm.variables.set(\"newGenreUpdatedName\", pm.variables.replaceIn('{{$timestamp}}'));\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"validate genre name updated properly\", () => {\r",
+							"    var getUpdatedGenreRequest = {\r",
+							"        url: pm.environment.get(\"host\") + '/Genres/' + pm.variables.get(\"newGenreId\"),\r",
+							"        method: \"GET\"\r",
+							"    }   \r",
+							"\r",
+							"    pm.sendRequest(getUpdatedGenreRequest, function(err, response){\r",
+							"        var actualUpdatedGenreName = response.json().name;\r",
+							"        console.info('actualUpdatedGenreName = ' + response.json().name)\r",
+							"        var expectedUpdatedGenreName = pm.variables.get('newGenreUpdatedName');\r",
+							"        console.info('expectedUpdatedGenreName = ' + expectedUpdatedGenreName)\r",
+							"\r",
+							"        pm.expect(actualUpdatedGenreName).to.eql(expectedUpdatedGenreName);\r",
+							"\r",
+							"        pm.variables.unset('updatedGenreName');\r",
+							"        pm.variables.unset('newGenreId');         \r",
+							"    })\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"genreId\": {{newGenreId}},\r\n    \"name\": \"{{newGenreUpdatedName}}\",\r\n    \"tracks\": []\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{host}}/{{genres}}/{{newGenreId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Genre",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var genresGetRequest = {\r",
+							"    url: pm.environment.get(\"host\") + '/Genres',\r",
+							"    method: \"GET\"\r",
+							"}\r",
+							"var genresIds = new Array();\r",
+							"pm.sendRequest(genresGetRequest, function(err, response){\r",
+							" genresIds = _.map(response.json(), function(genre){ \r",
+							"   return genre.genreId; \r",
+							"});\r",
+							"\r",
+							"    console.log(genresIds[genresIds.length - 1]);\r",
+							"    pm.environment.set(\"newGenreId\", genresIds[genresIds.length - 1] + 1);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+							"});\r",
+							"pm.test(\"Content-Type is present\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"});\r",
+							"pm.test(\"Successful POST request\", function () {\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 202]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body matches string\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"name\");\r",
+							"});\r",
+							"\r",
+							"var schema = {\r",
+							"  \"$schema\": \"http://json-schema.org/draft-04/schema#\",\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"genreId\": {\r",
+							"      \"type\": \"integer\"\r",
+							"    },\r",
+							"    \"name\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"tracks\": {\r",
+							"      \"type\": \"array\",\r",
+							"      \"items\": {}\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"genreId\",\r",
+							"    \"name\",\r",
+							"    \"tracks\"\r",
+							"  ]\r",
+							"};\r",
+							"\r",
+							"var Ajv = require('ajv'),\r",
+							"    ajv = new Ajv({ logger: console, allErrors: true }),\r",
+							"    schema = {\r",
+							"  \"$schema\": \"http://json-schema.org/draft-04/schema#\",\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"genreId\": {\r",
+							"      \"type\": \"integer\"\r",
+							"    },\r",
+							"    \"name\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"tracks\": {\r",
+							"      \"type\": \"array\",\r",
+							"      \"items\": {}\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"genreId\",\r",
+							"    \"name\",\r",
+							"    \"tracks\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"   pm.expect(ajv.validate(schema, jsonData), JSON.stringify(ajv.errors)).to.be.true;\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"genreId\": {{newGenreId}},\r\n    \"name\": \"{{$guid}}\",\r\n    \"tracks\": []\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{host}}/{{genres}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Albums By Id Data Driven",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"validate proper album returned when get album with id = \" + pm.iterationData.get(\"albumId\"), () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseJson.title).to.eql(pm.iterationData.get(\"title\"));\r",
+							"  pm.expect(responseJson.albumId).to.eql(pm.iterationData.get(\"albumId\"));\r",
+							"  pm.expect(responseJson.artistId).to.eql(pm.iterationData.get(\"artistId\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/{{albums}}/{{albumId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Albums",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"validate 347 albums available\", function (){\r",
+							"    pm.expect(pm.response.json().length).to.eql(347);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{bearerToken}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/{{albums}}"
+			},
+			"response": [
+				{
+					"name": "Get All Albums",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": "https://localhost:60714/api/Albums"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 May 2022 12:16:32 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Kestrel"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"albumId\": 1,\n        \"title\": \"For Those About To Rock We Salute You\",\n        \"artistId\": 1,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 2,\n        \"title\": \"Balls to the Wall\",\n        \"artistId\": 2,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 3,\n        \"title\": \"Restless and Wild\",\n        \"artistId\": 2,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 4,\n        \"title\": \"Let There Be Rock\",\n        \"artistId\": 1,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 5,\n        \"title\": \"Big Ones\",\n        \"artistId\": 3,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 6,\n        \"title\": \"Jagged Little Pill\",\n        \"artistId\": 4,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 7,\n        \"title\": \"Facelift\",\n        \"artistId\": 5,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 8,\n        \"title\": \"Warner 25 Anos\",\n        \"artistId\": 6,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 9,\n        \"title\": \"Plays Metallica By Four Cellos\",\n        \"artistId\": 7,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 10,\n        \"title\": \"Audioslave\",\n        \"artistId\": 8,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 11,\n        \"title\": \"1241cc68-e117-46c2-89d5-52cee7acbdd1\",\n        \"artistId\": 8,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 12,\n        \"title\": \"BackBeat Soundtrack\",\n        \"artistId\": 9,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 13,\n        \"title\": \"The Best Of Billy Cobham\",\n        \"artistId\": 10,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 14,\n        \"title\": \"Alcohol Fueled Brewtality Live! [Disc 1]\",\n        \"artistId\": 11,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 15,\n        \"title\": \"Rammstein\",\n        \"artistId\": 8,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 16,\n        \"title\": \"Black Sabbath\",\n        \"artistId\": 12,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 17,\n        \"title\": \"Black Sabbath Vol. 4 (Remaster)\",\n        \"artistId\": 12,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 18,\n        \"title\": \"Body Count\",\n        \"artistId\": 13,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 19,\n        \"title\": \"Chemical Wedding\",\n        \"artistId\": 14,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 20,\n        \"title\": \"The Best Of Buddy Guy - The Millenium Collection\",\n        \"artistId\": 15,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 21,\n        \"title\": \"Prenda Minha\",\n        \"artistId\": 16,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 22,\n        \"title\": \"Sozinho Remix Ao Vivo\",\n        \"artistId\": 16,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 23,\n        \"title\": \"Minha Historia\",\n        \"artistId\": 17,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 24,\n        \"title\": \"Afrociberdelia\",\n        \"artistId\": 18,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 25,\n        \"title\": \"Da Lama Ao Caos\",\n        \"artistId\": 18,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 26,\n        \"title\": \"Acústico MTV [Live]\",\n        \"artistId\": 19,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 27,\n        \"title\": \"Cidade Negra - Hits\",\n        \"artistId\": 19,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 28,\n        \"title\": \"Na Pista\",\n        \"artistId\": 20,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 29,\n        \"title\": \"Axé Bahia 2001\",\n        \"artistId\": 21,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 30,\n        \"title\": \"BBC Sessions [Disc 1] [Live]\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 31,\n        \"title\": \"Bongo Fury\",\n        \"artistId\": 23,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 32,\n        \"title\": \"Carnaval 2001\",\n        \"artistId\": 21,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 33,\n        \"title\": \"Chill: Brazil (Disc 1)\",\n        \"artistId\": 24,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 34,\n        \"title\": \"Chill: Brazil (Disc 2)\",\n        \"artistId\": 6,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 35,\n        \"title\": \"Garage Inc. (Disc 1)\",\n        \"artistId\": 50,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 36,\n        \"title\": \"Greatest Hits II\",\n        \"artistId\": 51,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 37,\n        \"title\": \"Greatest Kiss\",\n        \"artistId\": 52,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 38,\n        \"title\": \"Heart of the Night\",\n        \"artistId\": 53,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 39,\n        \"title\": \"International Superhits\",\n        \"artistId\": 54,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 40,\n        \"title\": \"Into The Light\",\n        \"artistId\": 55,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 41,\n        \"title\": \"Meus Momentos\",\n        \"artistId\": 56,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 42,\n        \"title\": \"Minha História\",\n        \"artistId\": 57,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 43,\n        \"title\": \"MK III The Final Concerts [Disc 1]\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 44,\n        \"title\": \"Physical Graffiti [Disc 1]\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 45,\n        \"title\": \"Sambas De Enredo 2001\",\n        \"artistId\": 21,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 46,\n        \"title\": \"Supernatural\",\n        \"artistId\": 59,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 47,\n        \"title\": \"The Best of Ed Motta\",\n        \"artistId\": 37,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 48,\n        \"title\": \"The Essential Miles Davis [Disc 1]\",\n        \"artistId\": 68,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 49,\n        \"title\": \"The Essential Miles Davis [Disc 2]\",\n        \"artistId\": 68,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 50,\n        \"title\": \"The Final Concerts (Disc 2)\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 51,\n        \"title\": \"Up An' Atom\",\n        \"artistId\": 69,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 52,\n        \"title\": \"Vinícius De Moraes - Sem Limite\",\n        \"artistId\": 70,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 53,\n        \"title\": \"Vozes do MPB\",\n        \"artistId\": 21,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 54,\n        \"title\": \"Chronicle, Vol. 1\",\n        \"artistId\": 76,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 55,\n        \"title\": \"Chronicle, Vol. 2\",\n        \"artistId\": 76,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 56,\n        \"title\": \"Cássia Eller - Coleção Sem Limite [Disc 2]\",\n        \"artistId\": 77,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 57,\n        \"title\": \"Cássia Eller - Sem Limite [Disc 1]\",\n        \"artistId\": 77,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 58,\n        \"title\": \"Come Taste The Band\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 59,\n        \"title\": \"Deep Purple In Rock\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 60,\n        \"title\": \"Fireball\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 61,\n        \"title\": \"Knocking at Your Back Door: The Best Of Deep Purple in the 80's\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 62,\n        \"title\": \"Machine Head\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 63,\n        \"title\": \"Purpendicular\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 64,\n        \"title\": \"Slaves And Masters\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 65,\n        \"title\": \"Stormbringer\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 66,\n        \"title\": \"The Battle Rages On\",\n        \"artistId\": 58,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 67,\n        \"title\": \"Vault: Def Leppard's Greatest Hits\",\n        \"artistId\": 78,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 68,\n        \"title\": \"Outbreak\",\n        \"artistId\": 79,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 69,\n        \"title\": \"Djavan Ao Vivo - Vol. 02\",\n        \"artistId\": 80,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 70,\n        \"title\": \"Djavan Ao Vivo - Vol. 1\",\n        \"artistId\": 80,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 71,\n        \"title\": \"Elis Regina-Minha História\",\n        \"artistId\": 41,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 72,\n        \"title\": \"The Cream Of Clapton\",\n        \"artistId\": 81,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 73,\n        \"title\": \"Unplugged\",\n        \"artistId\": 81,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 74,\n        \"title\": \"Album Of The Year\",\n        \"artistId\": 82,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 75,\n        \"title\": \"Angel Dust\",\n        \"artistId\": 82,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 76,\n        \"title\": \"King For A Day Fool For A Lifetime\",\n        \"artistId\": 82,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 77,\n        \"title\": \"The Real Thing\",\n        \"artistId\": 82,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 78,\n        \"title\": \"Deixa Entrar\",\n        \"artistId\": 83,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 79,\n        \"title\": \"In Your Honor [Disc 1]\",\n        \"artistId\": 84,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 80,\n        \"title\": \"In Your Honor [Disc 2]\",\n        \"artistId\": 84,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 81,\n        \"title\": \"One By One\",\n        \"artistId\": 84,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 82,\n        \"title\": \"The Colour And The Shape\",\n        \"artistId\": 84,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 83,\n        \"title\": \"My Way: The Best Of Frank Sinatra [Disc 1]\",\n        \"artistId\": 85,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 84,\n        \"title\": \"Roda De Funk\",\n        \"artistId\": 86,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 85,\n        \"title\": \"As Canções de Eu Tu Eles\",\n        \"artistId\": 27,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 86,\n        \"title\": \"Quanta Gente Veio Ver (Live)\",\n        \"artistId\": 27,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 87,\n        \"title\": \"Quanta Gente Veio ver--Bônus De Carnaval\",\n        \"artistId\": 27,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 88,\n        \"title\": \"Faceless\",\n        \"artistId\": 87,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 89,\n        \"title\": \"American Idiot\",\n        \"artistId\": 54,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 90,\n        \"title\": \"Appetite for Destruction\",\n        \"artistId\": 88,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 91,\n        \"title\": \"Use Your Illusion I\",\n        \"artistId\": 88,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 92,\n        \"title\": \"Use Your Illusion II\",\n        \"artistId\": 88,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 93,\n        \"title\": \"Blue Moods\",\n        \"artistId\": 89,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 94,\n        \"title\": \"A Matter of Life and Death\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 95,\n        \"title\": \"A Real Dead One\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 96,\n        \"title\": \"A Real Live One\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 97,\n        \"title\": \"Brave New World\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 98,\n        \"title\": \"Dance Of Death\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 99,\n        \"title\": \"Fear Of The Dark\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 100,\n        \"title\": \"Iron Maiden\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 101,\n        \"title\": \"Killers\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 102,\n        \"title\": \"Live After Death\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 103,\n        \"title\": \"Live At Donington 1992 (Disc 1)\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 104,\n        \"title\": \"Live At Donington 1992 (Disc 2)\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 105,\n        \"title\": \"No Prayer For The Dying\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 106,\n        \"title\": \"Piece Of Mind\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 107,\n        \"title\": \"Powerslave\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 108,\n        \"title\": \"Rock In Rio [CD1]\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 109,\n        \"title\": \"Rock In Rio [CD2]\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 110,\n        \"title\": \"Seventh Son of a Seventh Son\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 111,\n        \"title\": \"Somewhere in Time\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 112,\n        \"title\": \"The Number of The Beast\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 113,\n        \"title\": \"The X Factor\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 114,\n        \"title\": \"Virtual XI\",\n        \"artistId\": 90,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 115,\n        \"title\": \"Sex Machine\",\n        \"artistId\": 91,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 116,\n        \"title\": \"Emergency On Planet Earth\",\n        \"artistId\": 92,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 117,\n        \"title\": \"Synkronized\",\n        \"artistId\": 92,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 118,\n        \"title\": \"The Return Of The Space Cowboy\",\n        \"artistId\": 92,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 119,\n        \"title\": \"Get Born\",\n        \"artistId\": 93,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 120,\n        \"title\": \"Are You Experienced?\",\n        \"artistId\": 94,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 121,\n        \"title\": \"Surfing with the Alien (Remastered)\",\n        \"artistId\": 95,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 122,\n        \"title\": \"Jorge Ben Jor 25 Anos\",\n        \"artistId\": 46,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 123,\n        \"title\": \"Jota Quest-1995\",\n        \"artistId\": 96,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 124,\n        \"title\": \"Cafezinho\",\n        \"artistId\": 97,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 125,\n        \"title\": \"Living After Midnight\",\n        \"artistId\": 98,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 126,\n        \"title\": \"Unplugged [Live]\",\n        \"artistId\": 52,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 127,\n        \"title\": \"BBC Sessions [Disc 2] [Live]\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 128,\n        \"title\": \"Coda\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 129,\n        \"title\": \"Houses Of The Holy\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 130,\n        \"title\": \"In Through The Out Door\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 131,\n        \"title\": \"IV\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 132,\n        \"title\": \"Led Zeppelin I\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 133,\n        \"title\": \"Led Zeppelin II\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 134,\n        \"title\": \"Led Zeppelin III\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 135,\n        \"title\": \"Physical Graffiti [Disc 2]\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 136,\n        \"title\": \"Presence\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 137,\n        \"title\": \"The Song Remains The Same (Disc 1)\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 138,\n        \"title\": \"The Song Remains The Same (Disc 2)\",\n        \"artistId\": 22,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 139,\n        \"title\": \"A TempestadeTempestade Ou O Livro Dos Dias\",\n        \"artistId\": 99,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 140,\n        \"title\": \"Mais Do Mesmo\",\n        \"artistId\": 99,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 141,\n        \"title\": \"Greatest Hits\",\n        \"artistId\": 100,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 142,\n        \"title\": \"Lulu Santos - RCA 100 Anos De Música - Álbum 01\",\n        \"artistId\": 101,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 143,\n        \"title\": \"Lulu Santos - RCA 100 Anos De Música - Álbum 02\",\n        \"artistId\": 101,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 144,\n        \"title\": \"Misplaced Childhood\",\n        \"artistId\": 102,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 145,\n        \"title\": \"Barulhinho Bom\",\n        \"artistId\": 103,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 146,\n        \"title\": \"Seek And Shall Find: More Of The Best (1963-1981)\",\n        \"artistId\": 104,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 147,\n        \"title\": \"The Best Of Men At Work\",\n        \"artistId\": 105,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 148,\n        \"title\": \"Black Album\",\n        \"artistId\": 50,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 149,\n        \"title\": \"Garage Inc. (Disc 2)\",\n        \"artistId\": 50,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 150,\n        \"title\": \"Kill 'Em All\",\n        \"artistId\": 50,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 151,\n        \"title\": \"Load\",\n        \"artistId\": 50,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 152,\n        \"title\": \"Master Of Puppets\",\n        \"artistId\": 50,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 153,\n        \"title\": \"ReLoad\",\n        \"artistId\": 50,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 154,\n        \"title\": \"Ride The Lightning\",\n        \"artistId\": 50,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 155,\n        \"title\": \"St. Anger\",\n        \"artistId\": 50,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 156,\n        \"title\": \"...And Justice For All\",\n        \"artistId\": 50,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 157,\n        \"title\": \"Miles Ahead\",\n        \"artistId\": 68,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 158,\n        \"title\": \"Milton Nascimento Ao Vivo\",\n        \"artistId\": 42,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 159,\n        \"title\": \"Minas\",\n        \"artistId\": 42,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 160,\n        \"title\": \"Ace Of Spades\",\n        \"artistId\": 106,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 161,\n        \"title\": \"Demorou...\",\n        \"artistId\": 108,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 162,\n        \"title\": \"Motley Crue Greatest Hits\",\n        \"artistId\": 109,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 163,\n        \"title\": \"From The Muddy Banks Of The Wishkah [Live]\",\n        \"artistId\": 110,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 164,\n        \"title\": \"Nevermind\",\n        \"artistId\": 110,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 165,\n        \"title\": \"Compositores\",\n        \"artistId\": 111,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 166,\n        \"title\": \"Olodum\",\n        \"artistId\": 112,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 167,\n        \"title\": \"Acústico MTV\",\n        \"artistId\": 113,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 168,\n        \"title\": \"Arquivo II\",\n        \"artistId\": 113,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 169,\n        \"title\": \"Arquivo Os Paralamas Do Sucesso\",\n        \"artistId\": 113,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 170,\n        \"title\": \"Bark at the Moon (Remastered)\",\n        \"artistId\": 114,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 171,\n        \"title\": \"Blizzard of Ozz\",\n        \"artistId\": 114,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 172,\n        \"title\": \"Diary of a Madman (Remastered)\",\n        \"artistId\": 114,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 173,\n        \"title\": \"No More Tears (Remastered)\",\n        \"artistId\": 114,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 174,\n        \"title\": \"Tribute\",\n        \"artistId\": 114,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 175,\n        \"title\": \"Walking Into Clarksdale\",\n        \"artistId\": 115,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 176,\n        \"title\": \"Original Soundtracks 1\",\n        \"artistId\": 116,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 177,\n        \"title\": \"The Beast Live\",\n        \"artistId\": 117,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 178,\n        \"title\": \"Live On Two Legs [Live]\",\n        \"artistId\": 118,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 179,\n        \"title\": \"Pearl Jam\",\n        \"artistId\": 118,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 180,\n        \"title\": \"Riot Act\",\n        \"artistId\": 118,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 181,\n        \"title\": \"Ten\",\n        \"artistId\": 118,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 182,\n        \"title\": \"Vs.\",\n        \"artistId\": 118,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 183,\n        \"title\": \"Dark Side Of The Moon\",\n        \"artistId\": 120,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 184,\n        \"title\": \"Os Cães Ladram Mas A Caravana Não Pára\",\n        \"artistId\": 121,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 185,\n        \"title\": \"Greatest Hits I\",\n        \"artistId\": 51,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 186,\n        \"title\": \"News Of The World\",\n        \"artistId\": 51,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 187,\n        \"title\": \"Out Of Time\",\n        \"artistId\": 122,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 188,\n        \"title\": \"Green\",\n        \"artistId\": 124,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 189,\n        \"title\": \"New Adventures In Hi-Fi\",\n        \"artistId\": 124,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 190,\n        \"title\": \"The Best Of R.E.M.: The IRS Years\",\n        \"artistId\": 124,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 191,\n        \"title\": \"Cesta Básica\",\n        \"artistId\": 125,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 192,\n        \"title\": \"Raul Seixas\",\n        \"artistId\": 126,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 193,\n        \"title\": \"Blood Sugar Sex Magik\",\n        \"artistId\": 127,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 194,\n        \"title\": \"By The Way\",\n        \"artistId\": 127,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 195,\n        \"title\": \"Californication\",\n        \"artistId\": 127,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 196,\n        \"title\": \"Retrospective I (1974-1980)\",\n        \"artistId\": 128,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 197,\n        \"title\": \"Santana - As Years Go By\",\n        \"artistId\": 59,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 198,\n        \"title\": \"Santana Live\",\n        \"artistId\": 59,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 199,\n        \"title\": \"Maquinarama\",\n        \"artistId\": 130,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 200,\n        \"title\": \"O Samba Poconé\",\n        \"artistId\": 130,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 201,\n        \"title\": \"Judas 0: B-Sides and Rarities\",\n        \"artistId\": 131,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 202,\n        \"title\": \"Rotten Apples: Greatest Hits\",\n        \"artistId\": 131,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 203,\n        \"title\": \"A-Sides\",\n        \"artistId\": 132,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 204,\n        \"title\": \"Morning Dance\",\n        \"artistId\": 53,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 205,\n        \"title\": \"In Step\",\n        \"artistId\": 133,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 206,\n        \"title\": \"Core\",\n        \"artistId\": 134,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 207,\n        \"title\": \"Mezmerize\",\n        \"artistId\": 135,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 208,\n        \"title\": \"[1997] Black Light Syndrome\",\n        \"artistId\": 136,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 209,\n        \"title\": \"Live [Disc 1]\",\n        \"artistId\": 137,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 210,\n        \"title\": \"Live [Disc 2]\",\n        \"artistId\": 137,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 211,\n        \"title\": \"The Singles\",\n        \"artistId\": 138,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 212,\n        \"title\": \"Beyond Good And Evil\",\n        \"artistId\": 139,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 213,\n        \"title\": \"Pure Cult: The Best Of The Cult (For Rockers, Ravers, Lovers & Sinners) [UK]\",\n        \"artistId\": 139,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 214,\n        \"title\": \"The Doors\",\n        \"artistId\": 140,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 215,\n        \"title\": \"The Police Greatest Hits\",\n        \"artistId\": 141,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 216,\n        \"title\": \"Hot Rocks, 1964-1971 (Disc 1)\",\n        \"artistId\": 142,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 217,\n        \"title\": \"No Security\",\n        \"artistId\": 142,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 218,\n        \"title\": \"Voodoo Lounge\",\n        \"artistId\": 142,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 219,\n        \"title\": \"Tangents\",\n        \"artistId\": 143,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 220,\n        \"title\": \"Transmission\",\n        \"artistId\": 143,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 221,\n        \"title\": \"My Generation - The Very Best Of The Who\",\n        \"artistId\": 144,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 222,\n        \"title\": \"Serie Sem Limite (Disc 1)\",\n        \"artistId\": 145,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 223,\n        \"title\": \"Serie Sem Limite (Disc 2)\",\n        \"artistId\": 145,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 224,\n        \"title\": \"Acústico\",\n        \"artistId\": 146,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 225,\n        \"title\": \"Volume Dois\",\n        \"artistId\": 146,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 226,\n        \"title\": \"Battlestar Galactica: The Story So Far\",\n        \"artistId\": 147,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 227,\n        \"title\": \"Battlestar Galactica, Season 3\",\n        \"artistId\": 147,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 228,\n        \"title\": \"Heroes, Season 1\",\n        \"artistId\": 148,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 229,\n        \"title\": \"Lost, Season 3\",\n        \"artistId\": 149,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 230,\n        \"title\": \"Lost, Season 1\",\n        \"artistId\": 149,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 231,\n        \"title\": \"Lost, Season 2\",\n        \"artistId\": 149,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 232,\n        \"title\": \"Achtung Baby\",\n        \"artistId\": 150,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 233,\n        \"title\": \"All That You Can't Leave Behind\",\n        \"artistId\": 150,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 234,\n        \"title\": \"B-Sides 1980-1990\",\n        \"artistId\": 150,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 235,\n        \"title\": \"How To Dismantle An Atomic Bomb\",\n        \"artistId\": 150,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 236,\n        \"title\": \"Pop\",\n        \"artistId\": 150,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 237,\n        \"title\": \"Rattle And Hum\",\n        \"artistId\": 150,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 238,\n        \"title\": \"The Best Of 1980-1990\",\n        \"artistId\": 150,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 239,\n        \"title\": \"War\",\n        \"artistId\": 150,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 240,\n        \"title\": \"Zooropa\",\n        \"artistId\": 150,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 241,\n        \"title\": \"UB40 The Best Of - Volume Two [UK]\",\n        \"artistId\": 151,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 242,\n        \"title\": \"Diver Down\",\n        \"artistId\": 152,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 243,\n        \"title\": \"The Best Of Van Halen, Vol. I\",\n        \"artistId\": 152,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 244,\n        \"title\": \"Van Halen\",\n        \"artistId\": 152,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 245,\n        \"title\": \"Van Halen III\",\n        \"artistId\": 152,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 246,\n        \"title\": \"Contraband\",\n        \"artistId\": 153,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 247,\n        \"title\": \"Vinicius De Moraes\",\n        \"artistId\": 72,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 248,\n        \"title\": \"Ao Vivo [IMPORT]\",\n        \"artistId\": 155,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 249,\n        \"title\": \"The Office, Season 1\",\n        \"artistId\": 156,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 250,\n        \"title\": \"The Office, Season 2\",\n        \"artistId\": 156,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 251,\n        \"title\": \"The Office, Season 3\",\n        \"artistId\": 156,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 252,\n        \"title\": \"Un-Led-Ed\",\n        \"artistId\": 157,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 253,\n        \"title\": \"Battlestar Galactica (Classic), Season 1\",\n        \"artistId\": 158,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 254,\n        \"title\": \"Aquaman\",\n        \"artistId\": 159,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 255,\n        \"title\": \"Instant Karma: The Amnesty International Campaign to Save Darfur\",\n        \"artistId\": 150,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 256,\n        \"title\": \"Speak of the Devil\",\n        \"artistId\": 114,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 257,\n        \"title\": \"20th Century Masters - The Millennium Collection: The Best of Scorpions\",\n        \"artistId\": 179,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 258,\n        \"title\": \"House of Pain\",\n        \"artistId\": 180,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 259,\n        \"title\": \"Radio Brasil (O Som da Jovem Vanguarda) - Seleccao de Henrique Amaro\",\n        \"artistId\": 36,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 260,\n        \"title\": \"Cake: B-Sides and Rarities\",\n        \"artistId\": 196,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 261,\n        \"title\": \"LOST, Season 4\",\n        \"artistId\": 149,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 262,\n        \"title\": \"Quiet Songs\",\n        \"artistId\": 197,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 263,\n        \"title\": \"Muso Ko\",\n        \"artistId\": 198,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 264,\n        \"title\": \"Realize\",\n        \"artistId\": 199,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 265,\n        \"title\": \"Every Kind of Light\",\n        \"artistId\": 200,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 266,\n        \"title\": \"Duos II\",\n        \"artistId\": 201,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 267,\n        \"title\": \"Worlds\",\n        \"artistId\": 202,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 268,\n        \"title\": \"The Best of Beethoven\",\n        \"artistId\": 203,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 269,\n        \"title\": \"Temple of the Dog\",\n        \"artistId\": 204,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 270,\n        \"title\": \"Carry On\",\n        \"artistId\": 205,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 271,\n        \"title\": \"Revelations\",\n        \"artistId\": 8,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 272,\n        \"title\": \"Adorate Deum: Gregorian Chant from the Proper of the Mass\",\n        \"artistId\": 206,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 273,\n        \"title\": \"Allegri: Miserere\",\n        \"artistId\": 207,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 274,\n        \"title\": \"Pachelbel: Canon & Gigue\",\n        \"artistId\": 208,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 275,\n        \"title\": \"Vivaldi: The Four Seasons\",\n        \"artistId\": 209,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 276,\n        \"title\": \"Bach: Violin Concertos\",\n        \"artistId\": 210,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 277,\n        \"title\": \"Bach: Goldberg Variations\",\n        \"artistId\": 211,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 278,\n        \"title\": \"Bach: The Cello Suites\",\n        \"artistId\": 212,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 279,\n        \"title\": \"Handel: The Messiah (Highlights)\",\n        \"artistId\": 213,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 280,\n        \"title\": \"The World of Classical Favourites\",\n        \"artistId\": 214,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 281,\n        \"title\": \"Sir Neville Marriner: A Celebration\",\n        \"artistId\": 215,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 282,\n        \"title\": \"Mozart: Wind Concertos\",\n        \"artistId\": 216,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 283,\n        \"title\": \"Haydn: Symphonies 99 - 104\",\n        \"artistId\": 217,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 284,\n        \"title\": \"Beethoven: Symhonies Nos. 5 & 6\",\n        \"artistId\": 218,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 285,\n        \"title\": \"A Soprano Inspired\",\n        \"artistId\": 219,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 286,\n        \"title\": \"Great Opera Choruses\",\n        \"artistId\": 220,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 287,\n        \"title\": \"Wagner: Favourite Overtures\",\n        \"artistId\": 221,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 288,\n        \"title\": \"Fauré: Requiem, Ravel: Pavane & Others\",\n        \"artistId\": 222,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 289,\n        \"title\": \"Tchaikovsky: The Nutcracker\",\n        \"artistId\": 223,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 290,\n        \"title\": \"The Last Night of the Proms\",\n        \"artistId\": 224,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 291,\n        \"title\": \"Puccini: Madama Butterfly - Highlights\",\n        \"artistId\": 225,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 292,\n        \"title\": \"Holst: The Planets, Op. 32 & Vaughan Williams: Fantasies\",\n        \"artistId\": 226,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 293,\n        \"title\": \"Pavarotti's Opera Made Easy\",\n        \"artistId\": 227,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 294,\n        \"title\": \"Great Performances - Barber's Adagio and Other Romantic Favorites for Strings\",\n        \"artistId\": 228,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 295,\n        \"title\": \"Carmina Burana\",\n        \"artistId\": 229,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 296,\n        \"title\": \"A Copland Celebration, Vol. I\",\n        \"artistId\": 230,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 297,\n        \"title\": \"Bach: Toccata & Fugue in D Minor\",\n        \"artistId\": 231,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 298,\n        \"title\": \"Prokofiev: Symphony No.1\",\n        \"artistId\": 232,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 299,\n        \"title\": \"Scheherazade\",\n        \"artistId\": 233,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 300,\n        \"title\": \"Bach: The Brandenburg Concertos\",\n        \"artistId\": 234,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 301,\n        \"title\": \"Chopin: Piano Concertos Nos. 1 & 2\",\n        \"artistId\": 235,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 302,\n        \"title\": \"Mascagni: Cavalleria Rusticana\",\n        \"artistId\": 236,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 303,\n        \"title\": \"Sibelius: Finlandia\",\n        \"artistId\": 237,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 304,\n        \"title\": \"Beethoven Piano Sonatas: Moonlight & Pastorale\",\n        \"artistId\": 238,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 305,\n        \"title\": \"Great Recordings of the Century - Mahler: Das Lied von der Erde\",\n        \"artistId\": 240,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 306,\n        \"title\": \"Elgar: Cello Concerto & Vaughan Williams: Fantasias\",\n        \"artistId\": 241,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 307,\n        \"title\": \"Adams, John: The Chairman Dances\",\n        \"artistId\": 242,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 308,\n        \"title\": \"Tchaikovsky: 1812 Festival Overture, Op.49, Capriccio Italien & Beethoven: Wellington's Victory\",\n        \"artistId\": 243,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 309,\n        \"title\": \"Palestrina: Missa Papae Marcelli & Allegri: Miserere\",\n        \"artistId\": 244,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 310,\n        \"title\": \"Prokofiev: Romeo & Juliet\",\n        \"artistId\": 245,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 311,\n        \"title\": \"Strauss: Waltzes\",\n        \"artistId\": 226,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 312,\n        \"title\": \"Berlioz: Symphonie Fantastique\",\n        \"artistId\": 245,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 313,\n        \"title\": \"Bizet: Carmen Highlights\",\n        \"artistId\": 246,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 314,\n        \"title\": \"English Renaissance\",\n        \"artistId\": 247,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 315,\n        \"title\": \"Handel: Music for the Royal Fireworks (Original Version 1749)\",\n        \"artistId\": 208,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 316,\n        \"title\": \"Grieg: Peer Gynt Suites & Sibelius: Pelléas et Mélisande\",\n        \"artistId\": 248,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 317,\n        \"title\": \"Mozart Gala: Famous Arias\",\n        \"artistId\": 249,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 318,\n        \"title\": \"SCRIABIN: Vers la flamme\",\n        \"artistId\": 250,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 319,\n        \"title\": \"Armada: Music from the Courts of England and Spain\",\n        \"artistId\": 251,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 320,\n        \"title\": \"Mozart: Symphonies Nos. 40 & 41\",\n        \"artistId\": 248,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 321,\n        \"title\": \"Back to Black\",\n        \"artistId\": 252,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 322,\n        \"title\": \"Frank\",\n        \"artistId\": 252,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 323,\n        \"title\": \"Carried to Dust (Bonus Track Version)\",\n        \"artistId\": 253,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 324,\n        \"title\": \"Beethoven: Symphony No. 6 'Pastoral' Etc.\",\n        \"artistId\": 254,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 325,\n        \"title\": \"Bartok: Violin & Viola Concertos\",\n        \"artistId\": 255,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 326,\n        \"title\": \"Mendelssohn: A Midsummer Night's Dream\",\n        \"artistId\": 256,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 327,\n        \"title\": \"Bach: Orchestral Suites Nos. 1 - 4\",\n        \"artistId\": 257,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 328,\n        \"title\": \"Charpentier: Divertissements, Airs & Concerts\",\n        \"artistId\": 258,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 329,\n        \"title\": \"South American Getaway\",\n        \"artistId\": 259,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 330,\n        \"title\": \"Górecki: Symphony No. 3\",\n        \"artistId\": 260,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 331,\n        \"title\": \"Purcell: The Fairy Queen\",\n        \"artistId\": 261,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 332,\n        \"title\": \"The Ultimate Relexation Album\",\n        \"artistId\": 262,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 333,\n        \"title\": \"Purcell: Music for the Queen Mary\",\n        \"artistId\": 263,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 334,\n        \"title\": \"Weill: The Seven Deadly Sins\",\n        \"artistId\": 264,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 335,\n        \"title\": \"J.S. Bach: Chaconne, Suite in E Minor, Partita in E Major & Prelude, Fugue and Allegro\",\n        \"artistId\": 265,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 336,\n        \"title\": \"Prokofiev: Symphony No.5 & Stravinksy: Le Sacre Du Printemps\",\n        \"artistId\": 248,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 337,\n        \"title\": \"Szymanowski: Piano Works, Vol. 1\",\n        \"artistId\": 266,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 338,\n        \"title\": \"Nielsen: The Six Symphonies\",\n        \"artistId\": 267,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 339,\n        \"title\": \"Great Recordings of the Century: Paganini's 24 Caprices\",\n        \"artistId\": 268,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 340,\n        \"title\": \"Liszt - 12 Études D'Execution Transcendante\",\n        \"artistId\": 269,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 341,\n        \"title\": \"Great Recordings of the Century - Shubert: Schwanengesang, 4 Lieder\",\n        \"artistId\": 270,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 342,\n        \"title\": \"Locatelli: Concertos for Violin, Strings and Continuo, Vol. 3\",\n        \"artistId\": 271,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 343,\n        \"title\": \"Respighi:Pines of Rome\",\n        \"artistId\": 226,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 344,\n        \"title\": \"Schubert: The Late String Quartets & String Quintet (3 CD's)\",\n        \"artistId\": 272,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 345,\n        \"title\": \"Monteverdi: L'Orfeo\",\n        \"artistId\": 273,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 346,\n        \"title\": \"Mozart: Chamber Music\",\n        \"artistId\": 274,\n        \"artist\": null,\n        \"tracks\": []\n    },\n    {\n        \"albumId\": 347,\n        \"title\": \"Koyaanisqatsi (Soundtrack from the Motion Picture)\",\n        \"artistId\": 275,\n        \"artist\": null,\n        \"tracks\": []\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get Albums By Id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"validate proper album returned when get album with id = 10\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.title).to.eql(\"Audioslave\");\r",
+							"  pm.expect(responseJson.albumId).to.eql(10);\r",
+							"  pm.expect(responseJson.artistId).to.eql(8);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/{{albums}}/10"
+			},
+			"response": [
+				{
+					"name": "Get Albums By Id",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": "https://localhost:60714/api/Albums/10"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 May 2022 12:25:07 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Kestrel"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "whoIs=Bella; expires=Thu, 12 May 2022 12:27:07 GMT; path=/"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "ultimateRunner=Meissa; expires=Thu, 12 May 2022 12:28:07 GMT; path=/"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"albumId\": 10,\n    \"title\": \"Audioslave\",\n    \"artistId\": 8,\n    \"artist\": null,\n    \"tracks\": []\n}"
+				}
+			]
+		},
+		{
+			"name": "Get All Genres",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"validate 130 genres available\", function (){\r",
+							"    pm.expect(pm.response.json().length).to.eql(130);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/{{genres}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Tracks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"validate 3503 genres available\", function (){\r",
+							"    pm.expect(pm.response.json().length).to.eql(3503);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/{{tracks}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Album",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var albumsGetRequest = {\r",
+							"    url: pm.environment.get(\"host\") + '/Albums',\r",
+							"    method: \"GET\"\r",
+							"}\r",
+							"var albumsIds = new Array();\r",
+							"pm.sendRequest(albumsGetRequest, function(err, response){\r",
+							" albumsIds = _.map(response.json(), function(genre){ \r",
+							"   return genre.genreId; \r",
+							"});\r",
+							"\r",
+							"    console.log(albumsIds[albumsIds.length - 1]);\r",
+							"    pm.environment.set(\"newAlbumId\", albumsIds[albumsIds.length - 1] + 1);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+							"});\r",
+							"pm.test(\"Content-Type is present\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"});\r",
+							"pm.test(\"Successful POST request\", function () {\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 202]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body matches string\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"title\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"albumId\": 378,\r\n    \"title\": \"{{$randomCatchPhrase}}\",\r\n    \"artistId\": 1,\r\n    \"artist\": null,\r\n    \"tracks\": []\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{host}}/{{albums}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Update New Artist",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var artistsGetRequest = {\r",
+							"    url: pm.environment.get(\"host\") + '/Artists',\r",
+							"    method: \"GET\"\r",
+							"}\r",
+							"var artistsIds = new Array();\r",
+							"var newArtistId;\r",
+							"pm.sendRequest(artistsGetRequest, function(err, response){\r",
+							"    artistsIds = _.map(response.json(), function(response){ \r",
+							"        return response.artistId; \r",
+							"    });\r",
+							"    newArtistId = artistsIds[artistsIds.length - 1] + 1;\r",
+							"    pm.variables.set(\"newArtistId\", newArtistId);\r",
+							"\r",
+							"    var newArtistPostRequest = {\r",
+							"        url: pm.environment.get(\"host\") + '/Artists',\r",
+							"        method: 'POST',\r",
+							"        header: { 'content-type': 'application/json' },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: {\r",
+							"            \"artistId\": newArtistId,\r",
+							"            \"name\": pm.variables.replaceIn('{{$timestamp}}'),\r",
+							"            \"albums\": []\r",
+							"            }\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(newArtistPostRequest, function (err, response) {\r",
+							"        if (err) {\r",
+							"            console.log(err);\r",
+							"            console.log(response.body);\r",
+							"        }\r",
+							"    });\r",
+							"\r",
+							"    pm.variables.set(\"newArtistUpdatedName\", pm.variables.replaceIn('{{$timestamp}}'));\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"validate artist name updated properly\", () => {\r",
+							"    var getUpdatedArtistRequest = {\r",
+							"        url: pm.environment.get(\"host\") + '/Artists/' + pm.variables.get(\"newArtistId\"),\r",
+							"        method: \"GET\"\r",
+							"    }   \r",
+							"\r",
+							"    pm.sendRequest(getUpdatedArtistRequest, function(err, response){\r",
+							"        var actualUpdatedArtistName = response.json().name;\r",
+							"        console.info('actualUpdatedArtistName = ' + response.json().name)\r",
+							"        var expectedUpdatedArtistName = pm.variables.get('newArtistUpdatedName');\r",
+							"        console.info('expectedUpdatedArtistName = ' + expectedUpdatedArtistName)\r",
+							"\r",
+							"        pm.expect(actualUpdatedArtistName).to.eql(expectedUpdatedArtistName);\r",
+							"\r",
+							"        pm.variables.unset('updatedArtistName');\r",
+							"        pm.variables.unset('newArtistId');         \r",
+							"    })\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{host}}/{{artists}}/{{newArtistId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Artists",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"validate 275 artists available\", function (){\r",
+							"    pm.expect(pm.response.json().length).to.eql(275);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/{{artists}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Album",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.variables.set('albumId', 377);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should be valid JSON\", function () {\r",
+							"    pm.response.to.have.jsonBody();\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Album title is not empty\", function () {\r",
+							"    const albumTitle = pm.response.json().title;\r",
+							"    pm.expect(albumTitle).to.not.be.empty;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "{{host}}/{{albums}}/{{albumId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Artist",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.variables.set('artistId', 276);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should be valid JSON\", function () {\r",
+							"    pm.response.to.have.jsonBody();\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Artist name is not empty\", function () {\r",
+							"    const artistTitle = pm.response.json().name;\r",
+							"    pm.expect(artistTitle).to.not.be.empty;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "{{host}}/{{artists}}/{{artistId}}"
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiZWxsYXRyaXhVc2VyIiwianRpIjoiNjEyYjIzOTktNDUzMS00NmU0LTg5NjYtN2UxYmRhY2VmZTFlIiwibmJmIjoxNTE4NTI0NDg0LCJleHAiOjE1MjM3MDg0ODQsImlzcyI6ImF1dG9tYXRldGhlcGxhbmV0LmNvbSIsImF1ZCI6ImF1dG9tYXRldGhlcGxhbmV0LmNvbSJ9.Nq6OXqrK82KSmWNrpcokRIWYrXHanpinrqwbUlKT_cs"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "https://localhost:60714/api",
+			"type": "string",
+			"disabled": true
+		}
+	]
+}
