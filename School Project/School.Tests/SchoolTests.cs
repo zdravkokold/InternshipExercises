@@ -15,13 +15,15 @@ namespace School.Tests
         [TestMethod]
         public void TestStudentConstructorWithInvalidName()
         {
-            Assert.ThrowsException<ArgumentException>(() => new Student(" ", 10200), "Name cannot be empty or whitespace.");
+            var exception = Assert.ThrowsException<ArgumentException>(() => new Student(" ", 10200));
+            Assert.AreEqual("Name cannot be empty or whitespace.", exception.Message);
         }
 
         [TestMethod]
-        public void TestStudentConstructorWithInvalidUniqueNumber()
+         public void TestStudentConstructorWithInvalidUniqueNumber()
         {
-            Assert.ThrowsException<ArgumentException>(() => new Student(" ", 1000), "Unique Number must be between 10000 and 99999.");
+            var exception = Assert.ThrowsException<ArgumentException>(() => new Student("John", 1000));
+            Assert.AreEqual("Unique Number must be between 10000 and 99999.", exception.Message);
         }
 
         [TestMethod]
@@ -50,7 +52,7 @@ namespace School.Tests
         {
             var course = new Course();
 
-            var students = Enumerable.Range(20000, 31)
+            var students = Enumerable.Range(30000, 30)
             .Select(number => new Student($"Student{number}", number))
             .ToList();
 
@@ -59,7 +61,8 @@ namespace School.Tests
                 course.AddStudent(student);
             }
 
-            Assert.ThrowsException<ArgumentException>(() => course.AddStudent(new Student("Jo", 40000)), "Students must be maximum 30.");
+            var exception = Assert.ThrowsException<ArgumentException>(() => course.AddStudent(new Student("Jo", 22222)));
+            Assert.AreEqual("Students must be maximum 30.", exception.Message);
         }
     }
 }

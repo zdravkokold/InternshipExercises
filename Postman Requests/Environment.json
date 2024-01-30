@@ -1,0 +1,41 @@
+{
+	"id": "a7aae7fa-2561-441f-ac19-0e1a8e95bb3d",
+	"name": "Music Shop",
+	"values": [
+		{
+			"key": "authToken",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiZWxsYXRyaXhVc2VyIiwianRpIjoiNjEyYjIzOTktNDUzMS00NmU0LTg5NjYtN2UxYmRhY2VmZTFlIiwibmJmIjoxNTE4NTI0NDg0LCJleHAiOjE1MjM3MDg0ODQsImlzcyI6ImF1dG9tYXRldGhlcGxhbmV0LmNvbSIsImF1ZCI6ImF1dG9tYXRldGhlcGxhbmV0LmNvbSJ9.Nq6OXqrK82KSmWNrpcokRIWYrXHanpinrqwbUlKT_cs",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "host",
+			"value": "https://localhost:60714/api",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "genres",
+			"value": "Genres",
+			"enabled": true
+		},
+		{
+			"key": "albums",
+			"value": "Albums",
+			"enabled": true
+		},
+		{
+			"key": "tracks",
+			"value": "Tracks",
+			"enabled": true
+		},
+		{
+			"key": "artists",
+			"value": "Artists",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2024-01-26T14:14:40.322Z",
+	"_postman_exported_using": "Postman/10.22.6"
+}

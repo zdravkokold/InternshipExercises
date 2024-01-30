@@ -29,7 +29,7 @@
             get => uniqueNumber;
             set
             {
-                if (value < 10000 && value > 99999)
+                if (value < 10000 || value > 99999)
                 {
                     throw new ArgumentException("Unique Number must be between 10000 and 99999.");
                 }

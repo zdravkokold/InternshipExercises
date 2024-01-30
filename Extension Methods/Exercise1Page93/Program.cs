@@ -7,10 +7,7 @@ namespace Exercise1
     {
         public static string Substring(this StringBuilder stringBuilder, int index, int length)
         {
-            if (stringBuilder == null)
-            {
-                throw new ArgumentNullException(nameof(stringBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(stringBuilder);
 
             if (index < 0 || index >= stringBuilder.Length)
             {

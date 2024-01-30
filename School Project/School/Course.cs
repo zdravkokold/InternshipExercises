@@ -21,7 +21,7 @@ namespace School
 
         public void AddStudent(Student student)
         {
-            if (students.Count > 30)
+            if (students.Count >= 30)
             {
                 throw new ArgumentException("Students must be maximum 30.");
             }

@@ -57,13 +57,16 @@ p {
 }
 
 .facebook-login, .twitter-login, .google-login {
-    background-color: #1877f2;
     color: #fff;
     padding: 10px;
     margin-bottom: 10px;
     border: none;
     border-radius: 3px;
     cursor: pointer;
+}
+
+.facebook-login {
+    background-color: #1877f2;
 }
 
 .twitter-login {

@@ -20,8 +20,9 @@ namespace Geolocation
         }
 
         [Test]
-        [TestCase("Oslo")]
+        [Order(1)]
         [TestCase("Tokyo")]
+        [TestCase("Oslo")]
         [TestCase("Berlin")]
         [TestCase("Ottawa")]
         [TestCase("Taipei")]
@@ -46,13 +47,13 @@ namespace Geolocation
 
             IWebElement address = WaitAndFindElement(By.Id("iwtitle"));
 
-            Assert.IsTrue(address.Text.Contains(cityName));
+            Assert.IsTrue(address.Text.Contains(cityName), "Invalid city.");
         }
 
         [Test]
+        [Order(2)]
         [TestCase("Oslo")]
         [TestCase("Tokyo")]
-        [TestCase("Berlin")]
         [TestCase("Ottawa")]
         [TestCase("Taipei")]
         [TestCase("Canberra")]
@@ -79,7 +80,7 @@ namespace Geolocation
             addressTwo.SendKeys("Berlin. Germany");
             calculateButton.Click();
 
-            Assert.IsTrue(distance.Displayed);
+            Assert.IsTrue(distance.Displayed, "Invalid city.");
         }
 
         private static void SetGeolocation(ChromeDriver driver, double[] coordinates)

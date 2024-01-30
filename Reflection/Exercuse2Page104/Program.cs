@@ -7,10 +7,7 @@ namespace Exercuse2Page104
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string FullName
-        {
-            get => $"{FirstName} {LastName}"; set {}
-        }
+        public string FullName => $"{FirstName} {LastName}";
         public int Age { get; set; }
         public decimal Salary { get; private set; }
 
@@ -18,13 +15,13 @@ namespace Exercuse2Page104
         {
             FirstName = firstName;
             LastName = lastName;
-            Age = age;
             Salary = salary;
+            Age = age;
         }
 
         public void DisplayInfo()
         {
-            Console.WriteLine($"Name: {FirstName} {LastName}");
+            Console.WriteLine($"Name: {FullName}");
             Console.WriteLine($"Age: {Age}");
             Console.WriteLine($"Salary: ${Salary}");
         }
@@ -46,21 +43,23 @@ namespace Exercuse2Page104
     {
         static void Main()
         {
-            Worker johnDoe = new Worker("John", "Doe", 30, 50000);
+            Worker worker = new Worker("John", "Doe", 30, 50000);
 
-            Type workerType = johnDoe.GetType();
+            Type workerType = worker.GetType();
 
-            PropertyInfo fullNameProperty = workerType.GetProperty("FullName");
-            if (fullNameProperty == null)
+            PropertyInfo firstNameProperty = workerType.GetProperty("FirstName");
+            PropertyInfo lastNameProperty = workerType.GetProperty("LastName");
+            if (firstNameProperty != null && firstNameProperty != null)
             {
-                fullNameProperty.SetValue(johnDoe, "Ivan Draganov");
+                firstNameProperty.SetValue(worker, "Ivan");
+                lastNameProperty.SetValue(worker, "Draganov");
             }
 
             MethodInfo getCharacteristicsMethod = workerType.GetMethod("GetCharacteristics");
 
             if (getCharacteristicsMethod != null)
             {
-                object result = getCharacteristicsMethod.Invoke(johnDoe, new object[] { false });
+                object result = getCharacteristicsMethod.Invoke(worker, new object[] { true });
 
                 Console.WriteLine($"GetCharacteristics result: {result}");
             }

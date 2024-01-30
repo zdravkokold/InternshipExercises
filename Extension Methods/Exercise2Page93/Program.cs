@@ -1,17 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace Exercise2Page93
 {   
     public static class EnumerableExtensions
     {
         public static T Sum<T>(this IEnumerable<T> source)
+            where T : INumber<T>
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
-            dynamic sum = 0;
+            T sum = T.Zero;
             foreach (var item in source)
             {
                 sum += item;
@@ -20,6 +22,7 @@ namespace Exercise2Page93
         }
 
         public static T Min<T>(this IEnumerable<T> source)
+             where T : INumber<T>
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -27,7 +30,7 @@ namespace Exercise2Page93
             if (!source.Any())
                 throw new InvalidOperationException("Sequence contains no elements.");
 
-            dynamic min = source.First();
+            T min = source.First();
             foreach (var item in source.Skip(1))
             {
                 if (item < min)
@@ -37,6 +40,7 @@ namespace Exercise2Page93
         }
 
         public static T Max<T>(this IEnumerable<T> source)
+             where T : INumber<T>
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -44,7 +48,7 @@ namespace Exercise2Page93
             if (!source.Any())
                 throw new InvalidOperationException("Sequence contains no elements.");
 
-            dynamic max = source.First();
+            T max = source.First();
             foreach (var item in source.Skip(1))
             {
                 if (item > max)
@@ -53,7 +57,8 @@ namespace Exercise2Page93
             return max;
         }
 
-        public static double Average<T>(this IEnumerable<T> source)
+        public static T Average<T>(this IEnumerable<T> source)
+             where T : INumber<T>
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -61,8 +66,8 @@ namespace Exercise2Page93
             if (!source.Any())
                 throw new InvalidOperationException("Sequence contains no elements.");
 
-            dynamic sum = 0;
-            int count = 0;
+            T sum = T.Zero;
+            T count = T.Zero;
             foreach (var item in source)
             {
                 sum += item;
