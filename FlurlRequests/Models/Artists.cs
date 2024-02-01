@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace HttpClientRequests.Models;
-
+﻿namespace FlurlRequests.Models;
 public class Artists
 {
     public Artists() => Albums = new HashSet<Albums>();

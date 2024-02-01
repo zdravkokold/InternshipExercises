@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Examples.Models;
+using System.Collections.Generic;
 
-namespace HttpClientRequests.Models;
-
+namespace RestSharpRequests.Models;
 public class Genres
 {
     public Genres() => Tracks = new HashSet<Tracks>();
