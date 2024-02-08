@@ -6,6 +6,7 @@ using WebDriverManager;
 using ZipCodes.Pages.MainPage;
 using ZipCodes.Pages.ResultsPage;
 using ZipCodes.Pages.CityPage;
+using System.Reflection.Emit;
 
 namespace ZipCodes
 {
@@ -59,7 +60,8 @@ namespace ZipCodes
                 }
             }
 
-            string[] jpgFiles = Directory.GetFiles("C:\\Users\\ATP-1\\Pictures\\Screenshots", "*.jpg");
+            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Screenshots");
+            string[] jpgFiles = Directory.GetFiles(filePath, "*.jpg");
 
             Assert.AreEqual(10, jpgFiles.Length, $"Expected 10 .jpg files, but found {jpgFiles.Length}");
         }

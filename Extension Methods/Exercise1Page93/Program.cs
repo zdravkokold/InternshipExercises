@@ -5,9 +5,12 @@ namespace Exercise1
 {   
     public static class StringBuilderExtensions
     {
-        public static string Substring(this StringBuilder stringBuilder, int index, int length)
+        public static StringBuilder Substring(this StringBuilder stringBuilder, int index, int length)
         {
-            ArgumentNullException.ThrowIfNull(stringBuilder);
+            if (stringBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(stringBuilder));
+            }
 
             if (index < 0 || index >= stringBuilder.Length)
             {
@@ -19,13 +22,13 @@ namespace Exercise1
                 throw new ArgumentOutOfRangeException(nameof(length));
             }
 
-            char[] result = new char[length];
+            StringBuilder result = new StringBuilder(length);
             for (int i = 0; i < length; i++)
             {
-                result[i] = stringBuilder[index + i];
+                result.Append(stringBuilder[index + i]);
             }
 
-            return new string(result);
+            return result;
         }
     }
 
@@ -35,7 +38,7 @@ namespace Exercise1
         {
             StringBuilder sb = new StringBuilder("Hello, World!");
 
-            string substring = sb.Substring(7, 5);
+            StringBuilder substring = sb.Substring(7, 5);
             Console.WriteLine(substring);
         }
     }

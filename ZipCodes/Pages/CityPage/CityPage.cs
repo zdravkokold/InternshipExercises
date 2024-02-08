@@ -33,7 +33,11 @@ namespace ZipCodes.Pages.CityPage
         public void TakeScreeenshot(string cityName, string state, string zipCode)
         {
             Screenshot screenshot = ((ITakesScreenshot)Driver).GetScreenshot();
-            screenshot.SaveAsFile($"C:\\Users\\ATP-1\\Pictures\\Screenshots\\{cityName}-{state}-{zipCode}.jpg");
+
+            string picturesFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            string filePath = Path.Combine(picturesFolderPath, "Screenshots", $"{cityName}-{state}-{zipCode}.jpg");
+
+            screenshot.SaveAsFile(filePath);
         }
     }
 }
