@@ -33,9 +33,13 @@ namespace TodoMvc
         }
 
         [Test]
-        public void TestTodoListAndAddingItemsToLocalStorage()
+        [TestCase("React")]
+        [TestCase("Vue.js")]
+        [TestCase("Angular")]
+        [TestCase("Backbone.js")]
+        public void TestTodoListAndAddingItemsToLocalStorage(string technology)
         {
-            WaitAndFindElement(By.XPath("//span[@class='link' and text()='Backbone.js']")).Click();
+            WaitAndFindElement(By.XPath($"//span[@class='link' and text()='{technology}']")).Click();
 
             IJavaScriptExecutor jsExecutor = (IJavaScriptExecutor)driver;
             jsExecutor.ExecuteScript("window.localStorage.clear();");
